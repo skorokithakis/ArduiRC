@@ -1,16 +1,31 @@
 #!/usr/bin/env python
+"""Usage:
+  send.py [-hv] [--socket SOCKET] [--baud-rate RATE] [--timings-file FILE] ( <section> <command> | <timings> )
+
+Options:
+  -h --help               show this help and exit
+  -v --version            show version and exit
+  -t --timings-file FILE  specify the timings file to use [default: timings.yml]
+  -s --socket SOCKET      specify the socket to connect to [default: /dev/ttyACM0]
+  -b --baud-rate RATE     the baud rate to connect with [default: 9600]
+"""
 
 import serial
-import sys
-import time
+import yaml
 
-if len(sys.argv) == 2:
-    timings = [int(timing) for timing in sys.argv[1].split()]
-else:
-    print "Usage:\n\tsend.py <timings>"
-    sys.exit(1)
+from docopt import docopt
 
-com = serial.Serial("/dev/ttyACM0", 9600, timeout=0.2)
+arguments = docopt(__doc__, version="0.1.0")
+
+if arguments.get("<section>") and arguments.get("<command>"):
+    timing_dict = yaml.load(open(arguments["--timings-file"]))
+    raw_timings = timing_dict[arguments["<section>"]][arguments["<command>"]]
+elif arguments.get("<timings>"):
+    raw_timings = arguments["<timings>"]
+
+timings = [int(timing) for timing in raw_timings.split()]
+
+com = serial.Serial(arguments["--socket"], int(arguments["--baud-rate"]), timeout=0.2)
 
 output = "".join([chr(timing / 25) for timing in timings])
 com.write(output + chr(0))
