@@ -24,9 +24,8 @@ elif arguments.get("<timings>"):
     raw_timings = arguments["<timings>"]
 
 timings = [int(timing) for timing in raw_timings.split()]
+output = "".join([chr(int(round(timing / 25.0))) for timing in timings])
 
 com = serial.Serial(arguments["--socket"], int(arguments["--baud-rate"]), timeout=0.2)
-
-output = "".join([chr(timing / 25) for timing in timings])
 com.write(output + chr(0))
 print com.read(1000)
