@@ -11,6 +11,7 @@ void processMessage() {
     int status = LOW;
     int out = 0;
 
+    // Print the received timings to the console.
     for (i = 0; i < counter; i++) {
         out = message[i] * MULTIPLIER;
         Serial.print(out);
@@ -18,6 +19,7 @@ void processMessage() {
     }
     Serial.println("");
 
+    // Send the message.
     for (i = 0; i < counter; i++) {
         if (status == HIGH) {
             status = LOW;
@@ -28,6 +30,7 @@ void processMessage() {
         out = message[i] * MULTIPLIER;
         delayMicroseconds(out);
     }
+    // Reset, just in case.
     digitalWrite(OUT, LOW);
 }
 
@@ -47,12 +50,14 @@ void loop() {
         }
         character = Serial.read();
         if (character == 0) {
+            // Complete the message if we receive a null.
             digitalWrite(LED, HIGH);
             processMessage();
             digitalWrite(LED, LOW);
             Serial.println("Command sent.");
             counter = 0;
         } else {
+            // Append the received byte to the array.
             message[counter] = character;
             counter++;
         }
