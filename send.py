@@ -12,20 +12,33 @@ Options:
 
 import serial
 import yaml
+import sys
 
 from docopt import docopt
 
-arguments = docopt(__doc__, version="0.1.0")
 
-if arguments.get("<section>") and arguments.get("<command>"):
-    timing_dict = yaml.load(open(arguments["--timings-file"]))
-    raw_timings = timing_dict[arguments["<section>"]][arguments["<command>"]]
-elif arguments.get("<timings>"):
-    raw_timings = arguments["<timings>"]
+def main(arguments):
+    if arguments.get("<section>") and arguments.get("<command>"):
+        section = arguments["<section>"]
+        command = arguments["<command>"]
+        timing_dict = yaml.load(open(arguments["--timings-file"]))
+        if section not in timing_dict:
+            print("Unknown section.")
+            sys.exit(1)
+        if command not in timing_dict[section]:
+            print("Unknown command.")
+            sys.exit(1)
+        raw_timings = timing_dict[section][command]
+    elif arguments.get("<timings>"):
+        raw_timings = arguments["<timings>"]
 
-timings = [int(timing) for timing in raw_timings.split()]
-output = "".join([chr(int(round(timing / 25.0))) for timing in timings])
+    timings = [int(timing) for timing in raw_timings.split()]
+    output = "".join([chr(int(round(timing / 25.0))) for timing in timings])
 
-com = serial.Serial(arguments["--socket"], int(arguments["--baud-rate"]), timeout=0.2)
-com.write(output + chr(0))
-print com.read(1000)
+    com = serial.Serial(arguments["--socket"], int(arguments["--baud-rate"]), timeout=0.2)
+    com.write(output + chr(0))
+    print com.read(1000)
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__, version="0.1.0")
+    main(arguments)
