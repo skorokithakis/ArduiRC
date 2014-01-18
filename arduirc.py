@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Usage:
-  send.py [-hv] [--socket SOCKET] [--baud-rate RATE] [--timings-file FILE] ( <section> <command> | <timings> )
+  arduirc.py [-hv] [--socket SOCKET] [--baud-rate RATE] [--timings-file FILE] ( <section> <command> | <timings> )
 
 Options:
   -h --help               show this help and exit
