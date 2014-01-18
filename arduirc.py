@@ -21,13 +21,18 @@ def main(arguments):
     if arguments.get("<section>") and arguments.get("<command>"):
         section = arguments["<section>"]
         command = arguments["<command>"]
-        timing_dict = yaml.load(open(arguments["--timings-file"]))
+
+        try:
+            timing_dict = yaml.load(open(arguments["--timings-file"]))
+        except IOError:
+            sys.exit("Error opening timings file.")
+
         if section not in timing_dict:
-            print("Unknown section.")
-            sys.exit(1)
+            sys.exit("Unknown section.")
+
         if command not in timing_dict[section]:
-            print("Unknown command.")
-            sys.exit(1)
+            sys.exit("Unknown command.")
+
         raw_timings = timing_dict[section][command]
     elif arguments.get("<timings>"):
         raw_timings = arguments["<timings>"]
