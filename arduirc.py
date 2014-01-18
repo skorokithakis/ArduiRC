@@ -1,18 +1,23 @@
 #!/usr/bin/env python
 """Usage:
-  arduirc.py [-hv] [--socket SOCKET] [--baud-rate RATE] [--timings-file FILE] ( <section> <command> | <timings> )
+  arduirc.py [options] ( <section> <command> | <timings> )
 
 Options:
   -h --help               show this help and exit
   -v --version            show version and exit
-  -t --timings-file FILE  specify the timings file to use [default: timings.yml]
-  -s --socket SOCKET      specify the socket to connect to [default: /dev/ttyACM0]
-  -b --baud-rate RATE     the baud rate to connect with [default: 9600]
+  -t --timings-file=FILE  specify the timings file to use [default: timings.yml]
+  -s --socket=SOCKET      specify the socket to connect to [default: /dev/ttyACM0]
+  -w --wait               wait two seconds for the Arduino to reset.
+  -b --baud-rate=RATE     the baud rate to connect with [default: 9600]
+  -r --repeat=REPEAT      repeat the command REPEAT times [default: 3]
+  -d --delay=DELAY        delay between repeats (in usec) [default: 10000]
+  -p --pin=PIN            which Arduino pin to write to [default: 3]
 """
 
 import serial
-import yaml
 import sys
+import time
+import yaml
 
 from docopt import docopt
 
@@ -41,7 +46,16 @@ def main(arguments):
     output = "".join([chr(int(round(timing / 25.0))) for timing in timings])
 
     com = serial.Serial(arguments["--socket"], int(arguments["--baud-rate"]), timeout=0.2)
-    com.write(output + chr(0))
+
+    if arguments["--wait"]:
+        print "Waiting for the Arduino to reset..."
+        time.sleep(2)
+
+    pin = int(arguments["--pin"])
+    repeat = int(arguments["--repeat"])
+    delay = int(round(int(arguments["--delay"]) / 100.0))
+
+    com.write(chr(pin) + chr(repeat) + chr(delay) + output + chr(0))
     print com.read(1000)
 
 if __name__ == "__main__":
