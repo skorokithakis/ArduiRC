@@ -55,6 +55,15 @@ def main(arguments):
     repeat = int(arguments["--repeat"])
     delay = int(round(int(arguments["--delay"]) / 100.0))
 
+    if delay > 255 or delay < 1:
+        sys.exit("Delay must be between 100 and 25500.")
+
+    if pin > 13 or pin < 0:
+        sys.exit("Pin must be between 0 and 13.")
+
+    if repeat > 255 or repeat < 1:
+        sys.exit("Repeat must be between 1 and 255.")
+
     com.write(chr(pin) + chr(repeat) + chr(delay) + output + chr(0))
     print com.read(1000)
 
