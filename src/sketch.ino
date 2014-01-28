@@ -35,7 +35,7 @@ void transmit(char pin, unsigned char message[], unsigned char repeat, unsigned 
 }
 
 // Create the callback function
-void processMessage(char pin, unsigned char message[], unsigned char repeat, unsigned int intraDelay) {
+void cmdSend(char pin, unsigned char message[], unsigned char repeat, unsigned int intraDelay) {
     unsigned int out = 0;
     unsigned char i;
 
@@ -72,9 +72,6 @@ void setup() {
 
 void loop() {
     unsigned char character = 0;
-    unsigned char pin;
-    unsigned char repeat;
-    unsigned int intraDelay;
 
     while (Serial.available()) {
         if (gCounter >= MAX_MESSAGE_LENGTH) gCounter = 0;
@@ -90,10 +87,7 @@ void loop() {
 
         switch (gMessage[0]) {
             case 1:
-                pin = gMessage[1];
-                repeat = gMessage[2];
-                intraDelay = gMessage[3] * DELAY_MULTIPLIER;
-                processMessage(pin, &gMessage[4], repeat, intraDelay);
+                cmdSend(gMessage[1], &gMessage[4], gMessage[2], gMessage[3] * DELAY_MULTIPLIER);
                 break;
         }
 
