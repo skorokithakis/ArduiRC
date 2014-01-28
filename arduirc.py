@@ -64,7 +64,8 @@ def main(arguments):
     if repeat > 255 or repeat < 1:
         sys.exit("Repeat must be between 1 and 255.")
 
-    com.write(chr(pin) + chr(repeat) + chr(delay) + output + chr(0))
+    # chr(1) is the command (command 1, send timings).
+    com.write(chr(1) + chr(pin) + chr(repeat) + chr(delay) + output + chr(0))
     print com.read(1000)
 
 if __name__ == "__main__":

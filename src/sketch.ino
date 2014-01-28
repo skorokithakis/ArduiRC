@@ -82,13 +82,21 @@ void loop() {
         character = Serial.read();
         gMessage[gCounter++] = character;
 
-        if (gCounter > 2 && character == 0) {
-            // Process the message if we receive a null.
-            pin = gMessage[0];
-            repeat = gMessage[1];
-            intraDelay = gMessage[2] * DELAY_MULTIPLIER;
-            processMessage(pin, &gMessage[3], repeat, intraDelay);
-            gCounter = 0;
+        // Process the message if we receive a null.
+        if (character != 0) continue;
+
+        // Don't process early if the command is 1, because pin may also be a 0.
+        if ((gMessage[0] == 1) && (gCounter < 3)) continue;
+
+        switch (gMessage[0]) {
+            case 1:
+                pin = gMessage[1];
+                repeat = gMessage[2];
+                intraDelay = gMessage[3] * DELAY_MULTIPLIER;
+                processMessage(pin, &gMessage[4], repeat, intraDelay);
+                break;
         }
+
+        gCounter = 0;
     }
 }
